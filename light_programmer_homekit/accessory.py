@@ -2,9 +2,9 @@
 
 Every light light-programmer manages gets a Contact Sensor named
 "Communication to <light>", plus one system sensor named "Light Programmer".
-The polarity is inverted on purpose: a *reachable* light reads as **Opened**
-(communication is open) and a lost one as **Closed**, so Apple Home's fixed
-notification text — "<accessory name> Opened/Closed" — reads naturally.
+Polarity follows the standard contact-sensor convention: a *reachable* light
+reads as **Closed** (contact detected — the link is intact) and a lost one as
+**Opened**, matching how Apple Home treats Opened as the alert state.
 """
 import asyncio
 import logging
@@ -22,12 +22,12 @@ MODEL = "LightProgrammerBridge"
 DEFAULT_PREFIX = "Communication to "
 DEFAULT_POLL_INTERVAL = 30  # seconds between /lights polls
 # Consecutive failed /lights polls required before the system sensor flips to
-# Closed. Debounces a single transient timeout into a flap-free, no-notification
-# blip. Recovery (back to Opened) is NOT debounced — one good poll restores it.
+# Opened. Debounces a single transient timeout into a flap-free, no-notification
+# blip. Recovery (back to Closed) is NOT debounced — one good poll restores it.
 DEFAULT_FAIL_THRESHOLD = 3
 
 # ContactSensorState: 1 = "not detected" → Apple Home renders "Opened";
-# 0 = "detected" → "Closed". Reachable = open, lost = closed (inverted).
+# 0 = "detected" → "Closed". Reachable = closed, lost = opened (standard).
 _OPEN = 1
 _CLOSED = 0
 
@@ -89,13 +89,13 @@ class _ContactSensor(Accessory):
         _set_info(self, serial=serial, model="LightProgrammerContactSensor")
         serv = self.add_preload_service("ContactSensor")
         self.char_contact = serv.configure_char(
-            "ContactSensorState", value=_OPEN if connected else _CLOSED,
+            "ContactSensorState", value=_CLOSED if connected else _OPEN,
         )
 
     def set_connected(self, connected: bool) -> None:
         # set_value only notifies Apple Home when the value actually changes,
         # so re-applying the same state every poll is cheap and spam-free.
-        self.char_contact.set_value(_OPEN if connected else _CLOSED)
+        self.char_contact.set_value(_CLOSED if connected else _OPEN)
 
 
 class _StatusBridge(Bridge):

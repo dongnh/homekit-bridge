@@ -4,7 +4,7 @@ See your [light-programmer](https://github.com/dongnh/light_programmer) lights' 
 
 ## What it is
 
-One Contact Sensor per light, plus one for the whole system — the entire interface. Each light appears under the name you gave it; **Open** means the system can reach it, **Closed** means it dropped off (inverted on purpose, so Apple's "<name> Opened/Closed" reads naturally). A **"Light Programmer"** system sensor reports the daemon itself. Turn on notifications to hear the moment a light — or the daemon — goes quiet.
+One Contact Sensor per light, plus one for the whole system — the entire interface. Each light appears under the name you gave it; **Closed** means the system can reach it, **Open** means it dropped off (the standard contact-sensor convention: Open is the alert state). A **"Light Programmer"** system sensor reports the daemon itself. Turn on notifications to hear the moment a light — or the daemon — goes quiet.
 
 <img width="775" height="734" alt="image" src="https://github.com/user-attachments/assets/30ab8cdf-060e-4060-8222-6d05e81dacf6" />
 
@@ -29,7 +29,7 @@ A small JSON file — see [`examples/config.json`](examples/config.json). Fields
 - `bridge_name` — the name in Apple Home; it also seeds the stable MAC, so pick one you'll keep.
 - `pincode` — fixed setup code (`DDD-DD-DDD`). Without it the bridge generates a new code on every restart.
 - `poll_interval` — seconds between `/lights` polls.
-- `fail_threshold` — consecutive failed polls before the system sensor flips to Closed (debounces a transient blip).
+- `fail_threshold` — consecutive failed polls before the system sensor flips to Open (debounces a transient blip).
 - `notify_prefix` — text prepended to each light's name (default `"Communication to "`; set empty for bare names).
 
 The light names themselves come from light-programmer's config, not here.
